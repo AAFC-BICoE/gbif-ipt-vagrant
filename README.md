@@ -1,7 +1,7 @@
 gbif-ipt-vagrant
 ================
 
-Package to quickly launch a GBIF IPT instance inside a VM
+Package to quickly launch a [GBIF IPT](http://www.gbif.org/ipt) instance inside a [vagrant VM](https://www.vagrantup.com/)
 
 1) cd to an empty working directory 
 
