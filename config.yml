@@ -1,9 +1,19 @@
 vm:
-  virtualbox:
-    box: chef/debian-7.4
-  libvirt:
-    box: debian-7.4
-  ip: 10.128.124.131
+  provider:
+    virtualbox:
+      box: chef/debian-7.4
+    libvirt:
+      box: debian-7.4
+  networking:
+    type: bridge # private or public
+    public:
+      bridge: bond0 # Device to bridge
+      ip: 10.128.124.131
+      gateway: 10.128.124.1
+    private:
+      port_forward: #ports to forward guest-port: host-port
+        10000: 10000
+    #    8080: 8080
+     #   22: 10022
   memory: 4096
   cpus: 2
-
