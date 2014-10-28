@@ -1,0 +1,9 @@
+vm:
+  virtualbox:
+    box: chef/debian-7.4
+  libvirt:
+    box: debian-7.4
+  ip: 10.128.124.131
+  memory: 4096
+  cpus: 2
+

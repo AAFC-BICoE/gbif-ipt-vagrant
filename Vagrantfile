@@ -1,5 +1,12 @@
+require 'yaml'
+
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
 VAGRANTFILE_API_VERSION = "2"
+
+current_dir = File.dirname(__FILE__)
+
+#Load all configuration from a single yaml file
+conf = YAML.load_file("#{current_dir}/config.yml")
 
 #Provisioning script
 $script = <<SCRIPT
@@ -17,20 +24,25 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
-  # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "chef/debian-7.4"
+  config.vm.provider "virtualbox" do |v|
+    # Every Vagrant virtual environment requires a box to build off of.
+    config.vm.box = conf['vm']['libvirt']['box']
 
-  # Create a forwarded port mapping which allows access to the Tomcat port
-  # within the machine from a port on the host machine. 
-  config.vm.network "forwarded_port", guest: 8080, host: 8080
+    v.gui = true
+    config.vm.synced_folder ".", "/vagrant"
+  end
 
-  # Share an additional folder to the guest VM. The first argument is
-  # the path on the host to the actual folder. The second argument is
-  # the path on the guest to mount the folder. And the optional third
-  # argument is a set of non-required options.
-  config.vm.synced_folder "data", "/vagrant_data", create: true
+  config.vm.provider "libvirt" do |v|
+    config.vm.box = conf['vm']['libvirt']['box']
+    config.vm.synced_folder ".", "/vagrant", type: "p9"
+  end
+
+  v.customize ["modifyvm", :id, '--cpus', conf['vm']['cpus']]
+  v.customize ["modifyvm", :id, "--memory", conf['vm']['memory']]
+
+  # Set a static IP for the VM
+  config.vm.network "public_network", ip: conf['vm']['ip']
 
   # Run provisioning script
   config.vm.provision "shell", inline: $script
-
 end
