@@ -1,22 +1,18 @@
-local gateway=$2
-local dns=$3
+gateway=$1
+dns=$2
 
-#####################
-# NEW VM
-#####################
 if [ ! -f /etc/network/if-up.d/custom-network-config ]; then
 
-env
+# Make changes immediate
+sudo ip route del default
+sudo ip route add default via ${gateway}
 
+# Make changes permanent in the VM
 cat >/etc/network/if-up.d/custom-network-config <<EOL
 #!/bin/bash
-if [ "\$IFACE" != "eth1" ]; then
-exit 0
-fi
-#ifconfig eth1 down
-#ifconfig eth1 ${ip} up
-route del default
-route add default gw ${gateway}
+
+ip route del default
+ip route add default via ${gateway}
 
 EOL
 
@@ -25,14 +21,5 @@ nameserver ${dns}
 EOL
 
 chmod +x /etc/network/if-up.d/custom-network-config
-/etc/init.d/networking restart
-
-
-#####################
-# EXISTING VM
-#####################
-else
-
-/etc/init.d/networking restart
 
 fi
