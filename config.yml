@@ -1,0 +1,22 @@
+vm:
+  box-default: chef/debian-7.4
+  hostname: ipt.biodiversity.agr.gc.ca
+  memory: 4096
+  cpus: 2
+  provider:
+    libvirt:
+      box: debian-7.4
+  networking:
+    type: public # private: forward traffic through host IP.  public: provide VM with its own IP.
+    public:
+      bridge: bond0 # Device to bridge on the host
+      ip: 10.128.124.131 # IP of VM
+      gateway: 10.128.124.1 #  Gateway for the above IP
+      dns: 10.117.10.52 # DNS server - only 1 entry supported
+    private:
+      port-forward: #ports to forward guest-port: host-port
+        8080: 8080
+        22: 10022
+  shared-folders: # Synced folders guest-folder: host-folder
+    - guest-path: /ipt_data
+      host-path: ./ipt_data
