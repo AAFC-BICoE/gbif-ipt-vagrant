@@ -9,9 +9,9 @@ Package to quickly launch a [GBIF IPT](http://www.gbif.org/ipt) instance inside 
 
 3) Run "vagrant up" and wait for provisioning to complete
 
-4) Navigate to the IPT web application and complete the IPT configuration: http://localhost:8080/ipt (see networking section to modify IP and port)
+4) Navigate to the IPT web application and complete the IPT configuration: http://localhost:80/ (see networking section to modify IP, Hostname, and port)
 
-A subdirectory named "ipt-data" is created in the working directory which maps to "/ipt_data" inside the VM.
+By default, a subdirectory named "ipt-data" is created in the working directory which maps to "/ipt_data" inside the VM.
 
 Hypervisor Support & Information
 ================================
