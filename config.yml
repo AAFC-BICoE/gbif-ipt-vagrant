@@ -7,7 +7,7 @@ vm:
     libvirt:
       box: debian-7.4
   networking:
-    type: public # private: forward traffic through host IP.  public: provide VM with its own IP.
+    type: private # private: forward traffic through host IP.  public: provide VM with its own IP.
     public:
       bridge: bond0 # Device to bridge on the host
       ip: 10.128.124.131 # IP of VM

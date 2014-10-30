@@ -26,10 +26,11 @@ sudo rm -rf /var/lib/tomcat7/webapps/ROOT
 sudo perl -000 -pi.old -e 's#<!--\s+?(<Connector port="8009".+?>)\s+?-->#$1#' /etc/tomcat7/server.xml
 
 echo Downloading IPT
-sudo wget -nv http://repository.gbif.org/content/groups/gbif/org/gbif/ipt/2.1.1/ipt-2.1.1.war
+cd /vagrant
+sudo wget -N -nv http://repository.gbif.org/content/groups/gbif/org/gbif/ipt/2.1.1/ipt-2.1.1.war
 
 echo Installing IPT war in Tomcat
-sudo mv ipt-2.1.1.war /var/lib/tomcat7/webapps/ROOT.war
+sudo cp ipt*.war /var/lib/tomcat7/webapps/ROOT.war
 
 sudo service tomcat7 restart
 sudo service apache2 restart
