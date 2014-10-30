@@ -31,7 +31,7 @@ Support for the libvirt provider allows using several underlying hypervisors thr
 
 Ensure that you have installed the libvirt, kvm, and all relevant system packages and are able to start a KVM Virtual Machine before using this repository.  In addition, Vagrant will NFS mount the ipt-data folder in the VM from an NFS Server running on the Host.  To support this, you must install an NFS server on your host and modify the firewall to support TCP access to the relevant ports for the NFS server.  Vagrant will automatically configure and export the appropriate shares and restart the NFS Server when it starts the VM.
 
-The [vagrant-libvirt plugin](see https://github.com/pradels/vagrant-libvirt) is required before running *vagrant up*
+The [vagrant-libvirt plugin](https://github.com/pradels/vagrant-libvirt) is required before running *vagrant up*
 
 Inside the GIT repository you cloned, start the VM with libvirt using
 > vagrant up --provider=libvirt
