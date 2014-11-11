@@ -15,7 +15,7 @@ vm:
       dns: 10.117.10.52 # DNS server - only 1 entry supported
     private:
       port-forward: #ports to forward guest-port: host-port
-        80: 80
+        80: 4567
         22: 10022
   shared-folders: # Synced folders guest-folder: host-folder
     - guest-path: /ipt_data
