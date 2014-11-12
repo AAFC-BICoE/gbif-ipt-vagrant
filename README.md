@@ -33,10 +33,9 @@ Step) Description: *execute command in the terminal*
   * By default, a subdirectory named *ipt_data* is created in the working directory and maps to */ipt_data* inside the VM.  Use */ipt_data* when the IPT configuration prompts for a data folder.
   * In the IPT configuration, the Base URL should be set to the URL used to navigate to IPT.
 
-Hypervisor Support
-------------------
+## Hypervisor Support
 
-### VirtualBox (default) ###
+### VirtualBox (default)
 
 For this hypervisor, modifications are not required.  Folders between the hypervisor and host are synced using VirtualBox's Shared Folders.  This hypervisor permits using a Windows, Linux, or Mac host.
 
@@ -45,7 +44,7 @@ Ensure that you have VirtualBox installed before continuing.
 Inside the GIT repository you cloned, start the VM using
 > vagrant up
 
-### libvirt ###
+### libvirt
 
 Support for the libvirt provider allows using several underlying hypervisors through the libvirt api. KVM is the default hypervisor, which is supported using most modern Linux hosts.
 
@@ -56,16 +55,28 @@ The [vagrant-libvirt plugin](https://github.com/pradels/vagrant-libvirt) is requ
 Inside the GIT repository you cloned, start the VM with libvirt using
 > vagrant up --provider=libvirt
 
-Networking
-----------
+## Networking
 
 Two networking options are supported: *private* and *public*.  Modify *config.yml* and edit the *networking->type* parameter to switch between these two modes.  You can change this option and reload the VM using
 > vagrant reload --provision
 
-### Private networking ###
+### Private networking
 
 Vagrant establishes a network between the hypervisor and its VMs where traffic flow into the VM must be explicitly forwarded to the VM by defining port forwarding.  Hence, the VM's IP is not accessible from outside the VM.  This is advantageous when IPs are limited or adding DNS records is not possible, which means you are relying on an existing hostname and IP.  Nevertheless, this creates the need for port forwarding from the Host (Hypervisor) to the Guest, which causes a management overhead.  To specify the forwarded ports, modify *config.yml* and add/remove entries in *networking->private->port-forward* with a *guest-port: host-port* syntax.
 
-### Public Networking ###
+### Public Networking
 
 Vagrant creates a bridge interface to a logical device on the host (Hypervisor) and pass traffic through to it from the VM.  This permits assigning the VM a "public" IP and avoid the need for port forwarding.  Currently, DHCP is not supported.  Edit *config.yml* and modify the *ip*, *gateway*, *dns* parameters under *networking->public* accordingly.
+
+
+## Credits
+
+The following contributors have dedicated the time and effort to make this possible.
+
+Allan Jones
+Agriculture & Agri-Foods Canada
+
+Iyad Kandalaft
+Agriculture & Agri-Foods Canada
+
+If you feel that your name should be on this list, please make a pull request listing your contributions.
