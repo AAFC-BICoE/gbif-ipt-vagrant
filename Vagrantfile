@@ -40,9 +40,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   conf['vm']['shared-folders'].each do |folder|
+    folder['owner'] = 'vagrant' unless defined? folder['owner']
+    folder['group'] = 'vagrant' unless defined? folder['group']
+    
     unless File.directory?( folder['host-path'] )
       FileUtils.mkdir_p( folder['host-path'])
     end
+
     config.vm.synced_folder folder['host-path'], folder['guest-path'], owner: folder['owner'], group: folder['group']
   end
 
