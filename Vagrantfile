@@ -43,7 +43,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     unless File.directory?( folder['host-path'] )
       FileUtils.mkdir_p( folder['host-path'])
     end
-    config.vm.synced_folder folder['host-path'], folder['guest-path']
+    config.vm.synced_folder folder['host-path'], folder['guest-path'], owner: folder['owner'], group: folder['group']
   end
 
   config.vm.provider "virtualbox" do |provider, override|
