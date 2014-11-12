@@ -20,3 +20,5 @@ vm:
   shared-folders: # Synced folders guest-folder: host-folder
     - guest-path: /ipt_data
       host-path: ./ipt_data
+      owner: 105 # Tomcat7 user - must use UID as the alias gets created after installing Tomcat
+      group: vagrant
