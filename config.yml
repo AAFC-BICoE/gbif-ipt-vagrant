@@ -17,8 +17,10 @@ vm:
       port-forward: #ports to forward guest-port: host-port
         80: 4567
         22: 10022
-  shared-folders: # Synced folders guest-folder: host-folder
+  shared-folders:
+  # - guest-path: location to mount on guest
+  #   host-path: location on host - will be created if doesn't exist
+  #   owner: (optional) the owner of the folder used in VirtualBox's mounts
+  #   group: (optional) the group of the folder used in VirtualBox mounts
     - guest-path: /ipt_data
       host-path: ./ipt_data
-      owner: 105 # Tomcat7 user - must use UID as the alias gets created after installing Tomcat
-      group: vagrant

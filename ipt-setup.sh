@@ -16,6 +16,7 @@ cat >/etc/apache2/conf.d/ipt.conf <<EOL
 	ServerName localhost
 	ServerAlias `hostname -f` www.`hostname -f`
 	ProxyPass / ajp://localhost:8009/
+	ProxyPassReverse / http://localhost:8080/
 </VirtualHost>
 EOL
 
@@ -24,6 +25,9 @@ sudo rm -rf /var/lib/tomcat7/webapps/ROOT
 
 # Enable the AJP connect in tomcat
 sudo perl -000 -pi.old -e 's#<!--\s+?(<Connector port="8009".+?>)\s+?-->#$1#' /etc/tomcat7/server.xml
+
+# Allows tomcat7 user to access shared folders, which get the owner and group set to vagrant by default
+usermod -a -G vagrant tomcat7
 
 echo Downloading IPT
 cd /vagrant

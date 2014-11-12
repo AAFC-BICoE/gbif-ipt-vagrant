@@ -1,24 +1,44 @@
 gbif-ipt-vagrant
 ================
 
-Package to quickly launch a [GBIF IPT](http://www.gbif.org/ipt) instance inside a [Vagrant VM](https://www.vagrantup.com/)
+## Description
+
+Package to quickly launch a [GBIF IPT](http://www.gbif.org/ipt) instance inside a [Vagrant VM](https://www.vagrantup.com/).
+
+## Step by Step Instructions
+
+Step) Description: *execute command in the terminal*
 
 1) Clone this repository: *git clone http://github.com/aafc-mbb/gbif-ipt-vagrant*
 
-2) Modify relevant configuration in *config.yml*
-  * See networking section for more information
+2) Change directory into the cloned repository: *cd gbif-ipt-vagrant*
 
-3) Run *vagrant up* and wait for provisioning to complete
+3) Modify relevant configuration in *config.yml*
+  * See networking section for more information on private vs public networking
+  * See the hypervisor support section for more information
 
-4) Navigate to *http://localhost:4567/* and complete the IPT configuration
-  * A subdirectory named *ipt_data* is created in the working directory and maps to */ipt_data* inside the VM.
+4) Install vagrant:
+  * Debian/Ubuntu: *sudo apt-get install vagrant*
+  * RHEL/CentOS: Download vagrant from https://www.vagrantup.com/downloads.html
+
+5) Initialize the VM and wait for provisioning to complete: *vagrant up*
+  * To use the libvirt provider, see the Hypervisor Support section
+
+6) Navigate to IPT in a web browser
+  * Depending on the networking type configuration in config.yml:
+    * Private (default): Navigate to http://*hypervisor-hostname*:4567 where *hypervisor-hostname* is the name of the machine hosting the VM. You can determine this by typing *hostname -f* on the command line.
+    * Public:  Navigate to http://*hostname* or http://*ip* where *hostname* and *ip* are replaced by values from config.yml
+
+7) Complete the IPT configuration
+  * By default, a subdirectory named *ipt_data* is created in the working directory and maps to */ipt_data* inside the VM.  Use */ipt_data* when the IPT configuration prompts for a data folder.
+  * In the IPT configuration, the Base URL should be set to the URL used to navigate to IPT.
 
 Hypervisor Support
 ------------------
 
-### VirtualBox ###
+### VirtualBox (default) ###
 
-By default, vagrant uses VirtualBox.  For this hypervisor, modifications are not required.  Folders between the hypervisor and host are synced using VirtualBox's Shared Folders.  This hypervisor permits using a Windows, Linux, or Mac host.
+For this hypervisor, modifications are not required.  Folders between the hypervisor and host are synced using VirtualBox's Shared Folders.  This hypervisor permits using a Windows, Linux, or Mac host.
 
 Ensure that you have VirtualBox installed before continuing.
 
@@ -31,7 +51,7 @@ Support for the libvirt provider allows using several underlying hypervisors thr
 
 Ensure that you have installed the libvirt, kvm, and all relevant system packages and are able to start a KVM Virtual Machine before using this repository.  In addition, Vagrant will NFS mount the ipt-data folder in the VM from an NFS Server running on the Host.  To support this, you must install an NFS server on your host and modify the firewall to support TCP access to the relevant ports for the NFS server.  Vagrant will automatically configure and export the appropriate shares and restart the NFS Server when it starts the VM.
 
-The [vagrant-libvirt plugin](https://github.com/pradels/vagrant-libvirt) is required before running *vagrant up*
+The [vagrant-libvirt plugin](https://github.com/pradels/vagrant-libvirt) is required before issuing a vagrant up command.
 
 Inside the GIT repository you cloned, start the VM with libvirt using
 > vagrant up --provider=libvirt
