@@ -4,10 +4,26 @@ vm:
   memory: 4096
   cpus: 2
   provider:
+    openstack:
+      enabled: true # Set to 'true' if you want to use the openstack provider (vagrant-openstack-plugin required)
+      box: dummy
+      vm-name: 'IPT'
+      box-url: https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box
+      username: admin
+      api-key: admin
+      flavor: m1.small
+      project-name: admin
+      image: Ubuntu 14.04 Trusty
+      identity-auth-url: http://openstack-test.biodiversity.agr.gc.ca:5000/v2.0/tokens
+      ssh-username: ubuntu # Typically set in the image (default: ubuntu)
+      ssh-key-path: ~/.ssh/iyad # Location of the SSH private key
+      keypair-name: iyad # Key pair name in OpenStack (You must import it prior to using vagrant)
+      floating-ip: auto # Provide a floating-ip address, or set to 'auto', or leave it empty
     libvirt:
       box: debian-7.4
   networking:
-    type: private # private: forward traffic through host IP.  public: provide VM with its own IP.
+    # NOTE: Networking is ignored for the OpenStack provider.
+    type: public # private: forward traffic through host IP.  public: provide VM with its own IP.
     public:
       bridge: bond0 # Device to bridge on the host
       ip: 10.128.124.131 # IP of VM

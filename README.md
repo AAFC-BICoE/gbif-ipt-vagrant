@@ -14,7 +14,7 @@ Step) Description: *execute command in the terminal*
 2) Change directory into the cloned repository: *cd gbif-ipt-vagrant*
 
 3) Modify relevant configuration in *config.yml*
-  * See networking section for more information on private vs public networking
+  * See networking section for more information on private vs public networking (VirtualBox and libvirt providers only)
   * See the hypervisor support section for more information
 
 4) Install vagrant:
@@ -22,16 +22,20 @@ Step) Description: *execute command in the terminal*
   * RHEL/CentOS: Download vagrant from https://www.vagrantup.com/downloads.html
 
 5) Initialize the VM and wait for provisioning to complete: *vagrant up*
-  * To use the libvirt provider, see the Hypervisor Support section
+  * To use the libvirt or OpenStack provider, see the Hypervisor Support section.  Defaults to VirtualBox.
 
 6) Navigate to IPT in a web browser
-  * Depending on the networking type configuration in config.yml:
-    * Private (default): Navigate to http://*hypervisor-hostname*:4567 where *hypervisor-hostname* is the name of the machine hosting the VM. You can determine this by typing *hostname -f* on the command line.
-    * Public:  Navigate to http://*hostname* or http://*ip* where *hostname* and *ip* are replaced by values from config.yml
+  * libvirt and VirtualBox providers
+    * vm->networking->type in config.yml is set to:
+      * Private (default): Navigate to http://*hypervisor-hostname*:4567 where *hypervisor-hostname* is the name of the machine hosting the VM. You can determine this by typing *hostname -f* on the command line.
+      * Public:  Navigate to http://*hostname* or http://*ip* where *hostname* and *ip* are replaced by values from config.yml
+  * OpenStack provider
+    * vm->provider->openstack->floating-ip is set to auto (default) or an address: Navigate to http://*floating-ip* where *floating-ip* is displayed on vagrant-up and/or in openstack.
+    * vm->provider->openstack->floating-ip is not set (empty string): Navigate to http://*internal-ip* where *internal-ip* is displayed on vagrant-up and/or in openstack.
 
 7) Complete the IPT configuration
   * By default, a subdirectory named *ipt_data* is created in the working directory and maps to */ipt_data* inside the VM.  Use */ipt_data* when the IPT configuration prompts for a data folder.
-  * In the IPT configuration, the Base URL should be set to the URL used to navigate to IPT.
+  * In the IPT configuration, the Base URL should be set to the URL used to navigate to IPT (see step 6).
 
 ## Hypervisor Support
 
@@ -55,10 +59,55 @@ The [vagrant-libvirt plugin](https://github.com/pradels/vagrant-libvirt) is requ
 Inside the GIT repository you cloned, start the VM with libvirt using
 > vagrant up --provider=libvirt
 
+### OpenStack
+
+The [vagrant-openstack-plugin](https://github.com/cloudbau/vagrant-openstack-plugin) is required before issuing a vagrant up command.  This plugin is only compatible with Vagrant 1.4+ and can be installed using:
+> vagrant plugin install vagrant-openstack-plugin
+
+In addition, a dummy box must be installed as it is required for Vagrant to function:
+> vagrant box add dummy https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box
+
+Generate a private/public key pair to use for SSHing into the VM and register it in Openstack and your workstation.  See [Openstack's documentation](http://docs.openstack.org/user-guide/content/Launching_Instances_using_Dashboard.html) for more information.
+
+#### Configuration
+
+The openstack provider requires some configuration in *config.yml* under the vm->provider->openstack section.  
+
+*NOTE: This provider ignores the vm->networking section config.yml completely!*
+
+See the following for a brief explanation of the options.
+
+      enabled: true | false - Set to 'true' if you want to use the openstack provider (vagrant-openstack-plugin required)
+      box: dummy - Name of the empty box to user. This is a limitation of Vagrant.
+      vm-name: 'IPT' - Name of the instance that you will see in OpenStack
+      box-url: https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box - Place holder
+      username: admin - OpenStack identity/authentication username
+      api-key: admin - OpenStack identity/authentication password.
+      flavor: m1.small - Name of VM flavor to use. m1.small, m1.medium, etc are default flavours in openstack. They control the VM's cpu, mem, and storage paremeters.
+      project-name: admin | - The project name to use. Leave empty to use the default project for your account.
+      image: Ubuntu 14.04 Trusty - The base image to use (must be available in OpenStack).  This Vagrantfile is based on and tested on Debian 6 and Ubuntu 14.04 only.
+      identity-auth-url: http://openstack-test.biodiversity.agr.gc.ca:5000/v2.0/tokens - URL to identity service appended by "/tokens"
+      ssh-username: ubuntu - The username used to SSH into the VM, which is typically defined in the image (default is ubuntu for Ubuntu cloud images)
+      ssh-key-path: ~/.ssh/cloud.key - Location of the SSH private key on disk. You must generate a private/public key pair abd unoirt the public key to openstack.
+      keypair-name: iyad - Name of the private/public key pair defined in OpenStack.  You must generate a private/public key pair and import the public key to openstack.
+      floating-ip: 192.168.0.100 | auto | - Provide a floating-ip address, or set to 'auto', or leave it empty. This will be the IP used to access the VM.  If left empty, the nova network IP will be used.
+
+#### Starting VM
+
+Insite the GIT repository you cloned, start the VM with OpenStack using
+> vagrant up --provider=openstack
+
+#### Limitations
+
+* Not all openstack functionality is integrated into this Vagrantfile.  Adding additional functionality through the config.yml should be relateively simple.
+* The openstack provider does not "share" folders (e.g. /ipt_data) but rather rsyncs their content from provisioner to the VM.  Hence, the data lives in the VM and is lost when the VM is terminated!
+
 ## Networking
 
 Two networking options are supported: *private* and *public*.  Modify *config.yml* and edit the *networking->type* parameter to switch between these two modes.  You can change this option and reload the VM using
 > vagrant reload --provision
+
+Note: The OpenStack provider ignores the networking section in config.yml completely.  If using the OpenStack provider, please skip this section.
 
 ### Private networking
 
