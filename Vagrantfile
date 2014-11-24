@@ -79,7 +79,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       
       # Networking is Openstack's job - disable persistent networking configuration
       override.vm.provision :shell, :id => 'network', :path => nil, :inline => ""
-      override.vm.provision :shell, :path => "openstack-provision.sh"
+      override.vm.provision :shell, :path => 'provision-aws-os.sh'
 
       override.ssh.private_key_path = os['ssh-key-path']
       provider.server_name	= os['vm-name']
@@ -104,6 +104,40 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
         override.vm.provision :shell, :id => folder['guest-path'], :inline => 'echo "Changing owner and mode of shared folders"; chown -R %s.%s %s; chmod -R g+rwx %s' % [ folder_owner, folder_group, folder['guest-path'], folder['guest-path'] ]
       end
+    end
+  end
+
+  config.vm.provider "aws" do |provider, override|
+    aws = conf['vm']['provider']['aws']
+
+    override.vm.box = aws['box']
+    override.vm.box_url = aws['box-url']
+    
+    # Networking is Openstack's job - disable persistent networking configuration
+    override.vm.provision :shell, :id => 'network', :path => nil, :inline => ""
+    override.vm.provision :shell, :path => 'provision-aws-os.sh'
+
+    override.ssh.private_key_path = aws['ssh-key-path']
+    override.ssh.username = aws['ssh-username']
+
+    provider.access_key_id = aws['access-key-id']
+    provider.secret_access_key = aws['secret-access-key']
+    provider.keypair_name = aws['keypair-name']
+    provider.ami = aws['image']
+    provider.instance_type = aws['instance-type']
+    provider.tags = {
+      'Name' => aws['vm-name']
+    }
+
+    unless aws['elastic-ip'].nil?
+      provider.elastic_ip = aws['elastic-ip'] == 'auto' ? true : aws['elastic-ip']
+    end
+
+    conf['vm']['shared-folders'].each do |folder|
+      folder_owner = folder.has_key?('owner') ? folder['owner'] : aws['ssh-username']
+      folder_group = folder.has_key?('group') ? folder['group'] : aws['ssh-username']
+
+      override.vm.provision :shell, :id => folder['guest-path'], :inline => 'echo "Changing owner and mode of shared folders"; chown -R %s.%s %s; chmod -R g+rwx %s' % [ folder_owner, folder_group, folder['guest-path'], folder['guest-path'] ]
     end
   end
 
