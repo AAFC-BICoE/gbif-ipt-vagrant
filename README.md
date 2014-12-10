@@ -13,7 +13,7 @@ Step) Description: *execute command in the terminal*
 
 2) Change directory into the cloned repository: *cd gbif-ipt-vagrant*
 
-3) Modify relevant configuration in *config.yml*
+3) Copy the *config.yml.sample* to *config.yml* and modify it accordingly
   * See networking section for more information on private vs public networking (VirtualBox and libvirt providers only)
   * See the hypervisor support section for more information
 
@@ -102,12 +102,52 @@ Insite the GIT repository you cloned, start the VM with OpenStack using
 * Not all openstack functionality is integrated into this Vagrantfile.  Adding additional functionality through the config.yml should be relateively simple.
 * The openstack provider does not "share" folders (e.g. /ipt_data) but rather rsyncs their content from provisioner to the VM.  Hence, the data lives in the VM and is lost when the VM is terminated!
 
+### AWS
+
+The [vagrant-aws](https://github.com/mitchellh/vagrant-aws) plugin is required before issuing a vagrant up command.  This plugin is only compatible with Vagrant 1.2+ and can be installed using:
+> vagrant plugin install vagrant-aws
+
+In addition, a dummy box must be installed as it is required for Vagrant to function:
+> vagrant box add ubuntu_aws vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+
+Generate a private/public key pair to use for SSHing into the VM and register it in AWS and your workstation.  See [Amazon's keypair documentation]http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html) for more information.
+
+#### Configuration
+
+The AWS provider requires some configuration in *config.yml* under the vm->provider->aws section.  
+
+*NOTE: This provider ignores the vm->networking section config.yml completely!*
+
+See the following for a brief explanation of the options.
+
+i     vm-name: 'IPT' - Identifier to assign to VM
+      box: ubuntu_aws - A dummy box that Vagrant requires for backwards compatibility
+      box-url: https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box - The path for the dummy box
+      access-key-id:  ABCDEFGHIJKLMNOP - AWS access id
+      secret-access-key: ABCDEFHIJKLMNOPQRSTUVWXYZ1234567890 - AWS secret key
+      keypair-name: example-keypair - SSH keypair name in AWS (ensure it is in your default region)
+      ssh-key-path: ~/.ssh/example-keypair.pem - Private key path on your disk
+      ssh-username: ubuntu - Username to ssh with (set in the image)
+      instance-type: t2.micro - The instance type defines the CPU, Mem, and Storage for the VM 
+      image: ami-8827efe0 - Amazon Machine Image identifier
+      elastic-ip: - Provide an existing elastic-ip address, or set to 'auto' to assign a new one, or leave it empty
+
+#### Starting VM
+
+Insite the GIT repository you cloned, start the VM with AWS using
+> vagrant up --provider=aws
+
+#### Limitations
+
+* Not all AWS functionality is integrated into this Vagrantfile.  Adding additional functionality through the config.yml should be relateively simple.
+* The AWS provider does not "share" folders (e.g. /ipt_data) but rather rsyncs their content from provisioner to the VM.  Hence, the data lives in the VM and is lost when the VM is terminated!
+
 ## Networking
 
 Two networking options are supported: *private* and *public*.  Modify *config.yml* and edit the *networking->type* parameter to switch between these two modes.  You can change this option and reload the VM using
 > vagrant reload --provision
 
-Note: The OpenStack provider ignores the networking section in config.yml completely.  If using the OpenStack provider, please skip this section.
+Note: The OpenStack and AWS providers ignores the networking section in config.yml completely.  If using the OpenStack or AWS provider, please skip this section.
 
 ### Private networking
 
