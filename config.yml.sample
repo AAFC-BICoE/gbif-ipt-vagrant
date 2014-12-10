@@ -10,8 +10,8 @@ vm:
       box: dummy
       vm-name: 'IPT'
       box-url: https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box
-      username: admin
-      api-key: admin
+      username: <username>
+      api-key: <password>
       flavor: m1.small
       project-name: admin
       image: Ubuntu 14.04 Trusty
@@ -26,8 +26,8 @@ vm:
       vm-name: 'IPT'
       box: ubuntu_aws  # A dummy box that Vagrant requires for backwards compatibility
       box-url: https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box  # The path for the dummy box
-      access-key-id:  ABCDEFGHIJKLMNOP # AWS access id
-      secret-access-key: ABCDEFHIJKLMNOPQRSTUVWXYZ1234567890 # AWS secret key
+      access-key-id:  <AWS access id>
+      secret-access-key: <AWS secret key>
       keypair-name: example-keypair  # Key pair name in AWS
       ssh-key-path: ~/.ssh/example-keypair.pem # Key pair name in OpenStack
       ssh-username: ubuntu # Username to ssh with - set in the image

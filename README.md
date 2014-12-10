@@ -13,7 +13,7 @@ Step) Description: *execute command in the terminal*
 
 2) Change directory into the cloned repository: *cd gbif-ipt-vagrant*
 
-3) Modify relevant configuration in *config.yml*
+3) Copy the *config.yml.sample* to *config.yml* and modify it accordingly
   * See networking section for more information on private vs public networking (VirtualBox and libvirt providers only)
   * See the hypervisor support section for more information
 
