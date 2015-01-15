@@ -21,14 +21,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # options are documented and commented below. For a complete reference,
   # please see the online documentation at vagrantup.com.
 
-  config.vm.box = conf['vm']['box-default']
+  config.vm.box = conf['vm']['box']
   config.vm.hostname = conf['vm']['hostname']
 
   if conf['vm']['networking']['type'] == 'public'
     netconf = conf['vm']['networking']['public']
     # Set a static IP for the VM
-    config.vm.network "public_network", ip: netconf['ip'], dev: netconf['bridge'], id: "network"
-    config.vm.provision :shell, :id => "network", :path => "network-setup.sh", :args => '%s %s' % [ netconf['gateway'], netconf['dns'] ]
+    config.vm.network "public_network", ip: netconf['ip'], dev: netconf['bridge']
+    config.vm.provision "network", type: "shell", path: "network-setup.sh", args: "%s %s" % [ netconf['gateway'], netconf['dns'] ]
   else
     netconf = conf['vm']['networking']['private']
     netconf['port-forward'].each do |guest_port, host_port|
@@ -64,7 +64,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     override.vm.synced_folder ".", "/vagrant", type: "nfs", nfs_udp: "false"
 
     conf['vm']['shared-folders'].each do |folder|
-      override.vm.synced_folder folder['host-path'], folder['guest-path'], type: "nfs", nfs_udp: "false"
+      override.vm.synced_folder folder['host-path'], folder['guest-path'], type: "nfs", nfs_udp: "false", group: nil, owner: nil
     end
   end
 
@@ -78,8 +78,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       override.vm.box_url = os['box-url']
       
       # Networking is Openstack's job - disable persistent networking configuration
-      override.vm.provision :shell, :id => 'network', :path => nil, :inline => ""
-      override.vm.provision :shell, :path => 'provision-aws-os.sh'
+      override.vm.provision "network", type: "shell", path: nil, inline: ""
+      override.vm.provision "cloud", type: "shell", path: "provision-aws-os.sh"
 
       override.ssh.private_key_path = os['ssh-key-path']
       provider.server_name	= os['vm-name']
@@ -102,7 +102,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         folder_owner = folder.has_key?('owner') ? folder['owner'] : os['ssh-username']
         folder_group = folder.has_key?('group') ? folder['group'] : os['ssh-username']
 
-        override.vm.provision :shell, :id => folder['guest-path'], :inline => 'echo "Changing owner and mode of shared folders"; chown -R %s.%s %s; chmod -R g+rwx %s' % [ folder_owner, folder_group, folder['guest-path'], folder['guest-path'] ]
+        override.vm.provision folder['guest-path'], type: "shell", inline: 'echo "Changing owner and mode of shared folders"; chown -R %s.%s %s; chmod -R g+rwx %s' % [ folder_owner, folder_group, folder['guest-path'], folder['guest-path'] ]
       end
     end
   end
@@ -114,8 +114,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     override.vm.box_url = aws['box-url']
     
     # Networking is Openstack's job - disable persistent networking configuration
-    override.vm.provision :shell, :id => 'network', :path => nil, :inline => ""
-    override.vm.provision :shell, :path => 'provision-aws-os.sh'
+    override.vm.provision "network", type: "shell", path: nil, inline: ""
+    override.vm.provision "cloud", type: "shell", path: "provision-aws-os.sh"
 
     override.ssh.private_key_path = aws['ssh-key-path']
     override.ssh.username = aws['ssh-username']
@@ -137,10 +137,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       folder_owner = folder.has_key?('owner') ? folder['owner'] : aws['ssh-username']
       folder_group = folder.has_key?('group') ? folder['group'] : aws['ssh-username']
 
-      override.vm.provision :shell, :id => folder['guest-path'], :inline => 'echo "Changing owner and mode of shared folders"; chown -R %s.%s %s; chmod -R g+rwx %s' % [ folder_owner, folder_group, folder['guest-path'], folder['guest-path'] ]
+      override.vm.provision folder['guest-path'], type: "shell", inline: 'echo "Changing owner and mode of shared folders"; chown -R %s.%s %s; chmod -R g+rwx %s' % [ folder_owner, folder_group, folder['guest-path'], folder['guest-path'] ]
     end
   end
 
   # Run provisioning script
-  config.vm.provision "shell", path: "ipt-setup.sh", privileged: false
+  config.vm.provision "ipt-setup", type: "shell", path: "ipt-setup.sh", privileged: false
 end

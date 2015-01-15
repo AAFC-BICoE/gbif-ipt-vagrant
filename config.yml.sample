@@ -1,12 +1,12 @@
 vm:
-  box-default: chef/debian-7.4
-  hostname: ipt.biodiversity.agr.gc.ca
+  box: chef/debian-7.4
+  hostname: ipt.local
   memory: 4096
   cpus: 2
 
   provider:
     openstack:
-      enabled: true # Set to 'true' if you want to use the openstack provider (vagrant-openstack-plugin required)
+      enabled: false # Set to 'true' if you want to use the openstack provider (vagrant-openstack-plugin required)
       box: dummy
       vm-name: 'IPT'
       box-url: https://github.com/cloudbau/vagrant-openstack-plugin/raw/master/dummy.box
@@ -15,13 +15,13 @@ vm:
       flavor: m1.small
       project-name: admin
       image: Ubuntu 14.04 Trusty
-      identity-auth-url: http://openstack-test.biodiversity.agr.gc.ca:5000/v2.0/tokens
+      identity-auth-url: http://openstack-test.biodiversity.agr.gc.ca:5000/v2.0/tokens # Openstack's identity authentication service path
       ssh-username: ubuntu # Typically set in the image (default: ubuntu)
-      ssh-key-path: ~/.ssh/iyad # Location of the SSH private key
-      keypair-name: iyad # Key pair name in OpenStack (You must import it prior to using vagrant)
+      ssh-key-path: ~/.ssh/example-keypair.pem # SSH Private key path on your local system
+      keypair-name: example-keypair # Key pair name in OpenStack
       floating-ip: auto # Provide a floating-ip address, or set to 'auto', or leave it empty
     libvirt:
-      box: debian-7.4
+      box: baremettle/debian-7.5
     aws:
       vm-name: 'IPT'
       box: ubuntu_aws  # A dummy box that Vagrant requires for backwards compatibility
@@ -29,14 +29,14 @@ vm:
       access-key-id:  <AWS access id>
       secret-access-key: <AWS secret key>
       keypair-name: example-keypair  # Key pair name in AWS
-      ssh-key-path: ~/.ssh/example-keypair.pem # Key pair name in OpenStack
-      ssh-username: ubuntu # Username to ssh with - set in the image
+      ssh-key-path: ~/.ssh/example-keypair.pem # SSH private key path on your local system
+      ssh-username: ubuntu # Username used when creating an SSH session with the guest - set in the image
       instance-type: t2.micro # The instance type defines the CPU, Mem, and Storage for the VM 
       image: ami-8827efe0 # Amazon Machine Image identifier
       elastic-ip: # Provide an existing elastic-ip address, or set to 'auto' to assign a new one, or leave it empty
   networking:
     # NOTE: Networking is ignored for the OpenStack provider.
-    type: public # private: forward traffic through host IP.  public: provide VM with its own IP.
+    type: private # private: forward traffic through host IP.  public: provide VM with its own IP.
     public:
       bridge: bond0 # Device to bridge on the host
       ip: 10.128.124.131 # IP of VM

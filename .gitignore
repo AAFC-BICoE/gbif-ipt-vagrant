@@ -1,1 +1,5 @@
 config.yml
+*.pem
+*.pub
+*.key
+*.war
