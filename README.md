@@ -5,6 +5,11 @@ gbif-ipt-vagrant
 
 Package to quickly launch a [GBIF IPT](http://www.gbif.org/ipt) instance inside a [Vagrant VM](https://www.vagrantup.com/).
 
+## Requirements
+
+Vagrant 1.7+: Some functionality being used in this Vagrantfile is available since Vagrant v1.6.5 but have been only tested with Vagrant v1.7.
+Please see the Hypervisor Support section for additional requirements that depend on your configuration.
+
 ## Step by Step Instructions
 
 Step) Description: *execute command in the terminal*
@@ -29,7 +34,7 @@ Step) Description: *execute command in the terminal*
     * vm->networking->type in config.yml is set to:
       * Private (default): Navigate to http://*hypervisor-hostname*:4567 where *hypervisor-hostname* is the name of the machine hosting the VM. You can determine this by typing *hostname -f* on the command line.
       * Public:  Navigate to http://*hostname* or http://*ip* where *hostname* and *ip* are replaced by values from config.yml
-  * OpenStack provider
+  * OpenStack and AWS provider
     * vm->provider->openstack->floating-ip is set to auto (default) or an address: Navigate to http://*floating-ip* where *floating-ip* is displayed on vagrant-up and/or in openstack.
     * vm->provider->openstack->floating-ip is not set (empty string): Navigate to http://*internal-ip* where *internal-ip* is displayed on vagrant-up and/or in openstack.
 
@@ -54,7 +59,10 @@ Support for the libvirt provider allows using several underlying hypervisors thr
 
 Ensure that you have installed the libvirt, kvm, and all relevant system packages and are able to start a KVM Virtual Machine before using this repository.  In addition, Vagrant will NFS mount the ipt-data folder in the VM from an NFS Server running on the Host.  To support this, you must install an NFS server on your host and modify the firewall to support TCP access to the relevant ports for the NFS server.  Vagrant will automatically configure and export the appropriate shares and restart the NFS Server when it starts the VM.
 
-The [vagrant-libvirt plugin](https://github.com/pradels/vagrant-libvirt) is required before issuing a vagrant up command.
+The [vagrant-libvirt plugin](https://github.com/pradels/vagrant-libvirt) is required before issuing a vagrant up command.  This requires system packages to be installed.  Ob debian based systems: libxslt-dev libxml2-dev libvirt-dev .  On fedora based systems: libxslt-devel libxml2-devel libvirt-devel
+> vagrant plugin install vagrant-libvirt
+
+In addition, you must convert the Vagrant box from the VirtualBox format to the libvirt format using [vagrant-mutate](https://github.com/sciurus/vagrant-mutate).
 
 Inside the GIT repository you cloned, start the VM with libvirt using
 > vagrant up --provider=libvirt
